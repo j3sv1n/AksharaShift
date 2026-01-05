@@ -37,8 +37,8 @@ public partial class MainWindow : Window
         textProcessor = new TextProcessor();
         
         // Setup event handlers
-        keyboardHook.OnWinShiftM += KeyboardHook_OnWinShiftM;
-        keyboardHook.OnWinShiftF += KeyboardHook_OnWinShiftF;
+        keyboardHook.OnCtrlAlt1 += KeyboardHook_OnCtrlAlt1;
+        keyboardHook.OnCtrlAlt2 += KeyboardHook_OnCtrlAlt2;
 
         // Setup system tray
         SetupSystemTray();
@@ -65,11 +65,11 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Handles Win+Shift+M (ML Format)
+    /// Handles Ctrl+Alt+1 (ML Format)
     /// </summary>
-    private void KeyboardHook_OnWinShiftM(object? sender, KeyEventArgs e)
+    private void KeyboardHook_OnCtrlAlt1(object? sender, KeyEventArgs e)
     {
-        if (!isEnabled || !KeyboardLayoutDetector.IsMalayalamPhoneticActive())
+        if (!isEnabled)
             return;
 
         try
@@ -83,11 +83,11 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Handles Win+Shift+F (FML Format)
+    /// Handles Ctrl+Alt+2 (FML Format)
     /// </summary>
-    private void KeyboardHook_OnWinShiftF(object? sender, KeyEventArgs e)
+    private void KeyboardHook_OnCtrlAlt2(object? sender, KeyEventArgs e)
     {
-        if (!isEnabled || !KeyboardLayoutDetector.IsMalayalamPhoneticActive())
+        if (!isEnabled)
             return;
 
         try

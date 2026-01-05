@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Windows;
+using System.IO;
 
 namespace AksharaShift
 {
@@ -12,6 +13,16 @@ namespace AksharaShift
     {
         private string previousClipboardContent = string.Empty;
         private bool hasStoredClipboard = false;
+        private string logPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "aksharashift_debug.log");
+
+        private void Log(string message)
+        {
+            try
+            {
+                File.AppendAllText(logPath, $"[{DateTime.Now:HH:mm:ss}] {message}\n");
+            }
+            catch { }
+        }
 
         /// <summary>
         /// Saves the current clipboard content before modification.
@@ -90,28 +101,40 @@ namespace AksharaShift
 
         /// <summary>
         /// Gets the currently selected text using clipboard simulation.
+        /// Tries multiple approaches to capture selected text.
         /// </summary>
         /// <returns>Selected text, or empty string if operation fails</returns>
         public string GetSelectedText()
         {
             try
             {
+                // First, try with standard Ctrl+C approach
                 SaveClipboardContent();
                 
                 // Clear clipboard
                 System.Windows.Forms.Clipboard.Clear();
-                Thread.Sleep(50);
+                Thread.Sleep(100);
 
-                // Copy selected text using Ctrl+C
-                CopySelectedText();
-
-                // Get the copied text
-                string selectedText = System.Windows.Forms.Clipboard.GetText() ?? string.Empty;
+                // Copy selected text using Ctrl+C (multiple attempts)
+                for (int i = 0; i < 3; i++)
+                {
+                    CopySelectedText();
+                    Thread.Sleep(150);
+                    
+                    string selectedText = System.Windows.Forms.Clipboard.GetText() ?? string.Empty;
+                    if (!string.IsNullOrEmpty(selectedText))
+                    {
+                        Log($"Text captured on attempt {i + 1}: '{selectedText}'");
+                        return selectedText;
+                    }
+                }
                 
-                return selectedText;
+                Log("Failed to capture text with Ctrl+C, returning empty");
+                return string.Empty;
             }
-            catch
+            catch (Exception ex)
             {
+                Log($"GetSelectedText exception: {ex.Message}");
                 return string.Empty;
             }
         }
@@ -129,14 +152,20 @@ namespace AksharaShift
         {
             try
             {
+                Log($"=== Conversion started: {conversionType} ===");
+                
                 // Save current clipboard
                 SaveClipboardContent();
+                Log($"Saved clipboard: '{previousClipboardContent}'");
 
                 // Get selected text
                 string selectedText = GetSelectedText();
+                Log($"Selected text captured: '{selectedText}' (length: {selectedText.Length})");
+                Log($"Selected text bytes: {string.Join(",", System.Text.Encoding.UTF8.GetBytes(selectedText))}");
                 
                 if (string.IsNullOrEmpty(selectedText))
                 {
+                    Log("Selected text is empty, aborting");
                     RestoreClipboardContent();
                     return false;
                 }
@@ -145,16 +174,22 @@ namespace AksharaShift
                 string convertedText = conversionType == ConversionType.ML
                     ? MalayalamTextConverter.ConvertToML(selectedText)
                     : MalayalamTextConverter.ConvertToFML(selectedText);
+                
+                Log($"Converted text: '{convertedText}' (length: {convertedText.Length})");
+                Log($"Converted text bytes: {string.Join(",", System.Text.Encoding.UTF8.GetBytes(convertedText))}");
 
                 // Put converted text in clipboard
                 System.Windows.Forms.Clipboard.SetText(convertedText);
+                Log("Set clipboard to converted text");
                 Thread.Sleep(50);
 
                 // Paste the converted text
                 PasteText();
+                Log("Pasted converted text");
 
                 // Restore original clipboard content
                 RestoreClipboardContent();
+                Log("Restored original clipboard");
 
                 return true;
             }

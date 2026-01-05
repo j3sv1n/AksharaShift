@@ -15,15 +15,12 @@ namespace AksharaShift
         private const int WM_KEYDOWN = 0x0100;
 
         // Virtual key codes
-        private const int VK_LWIN = 0x5B;
-        private const int VK_RWIN = 0x5C;
-        private const int VK_SHIFT = 0x10;
-        private const int VK_M = 0x4D;
-        private const int VK_F = 0x46;
-
-        // Keyboard state
-        private bool isWinPressed = false;
-        private bool isShiftPressed = false;
+        private const int VK_LCTRL = 0xA2;
+        private const int VK_RCTRL = 0xA3;
+        private const int VK_LMENU = 0xA4;  // Alt key
+        private const int VK_RMENU = 0xA5;  // Alt key
+        private const int VK_1 = 0x31;
+        private const int VK_2 = 0x32;
 
         // P/Invoke declarations for Windows API
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
@@ -48,8 +45,8 @@ namespace AksharaShift
         private LowLevelKeyboardProc? hookProc = null;
 
         // Events
-        public event EventHandler<KeyEventArgs>? OnWinShiftM;
-        public event EventHandler<KeyEventArgs>? OnWinShiftF;
+        public event EventHandler<KeyEventArgs>? OnCtrlAlt1;
+        public event EventHandler<KeyEventArgs>? OnCtrlAlt2;
 
         /// <summary>
         /// Installs the global keyboard hook.
@@ -87,50 +84,27 @@ namespace AksharaShift
         /// </summary>
         private IntPtr HookCallback(int nCode, IntPtr wParam, IntPtr lParam)
         {
-            if (nCode >= 0 && wParam == (IntPtr)WM_KEYDOWN)
-            {
-                // Get the virtual key code
-                int vkCode = Marshal.ReadInt32(lParam);
-
-                // Track Win key state
-                if (vkCode == VK_LWIN || vkCode == VK_RWIN)
-                {
-                    isWinPressed = true;
-                }
-
-                // Track Shift key state
-                if (vkCode == VK_SHIFT)
-                {
-                    isShiftPressed = true;
-                }
-
-                // Detect Win+Shift+M
-                if (vkCode == VK_M && isWinPressed && isShiftPressed)
-                {
-                    OnWinShiftM?.Invoke(this, new KeyEventArgs());
-                }
-
-                // Detect Win+Shift+F
-                if (vkCode == VK_F && isWinPressed && isShiftPressed)
-                {
-                    OnWinShiftF?.Invoke(this, new KeyEventArgs());
-                }
-            }
-
-            // Update key states on key up
-            if (wParam == (IntPtr)0x0101) // WM_KEYUP
+            if (nCode >= 0)
             {
                 int vkCode = Marshal.ReadInt32(lParam);
+                
+                // Always check current key states using GetAsyncKeyState for accuracy
+                bool ctrlPressed = (GetAsyncKeyState(VK_LCTRL) & 0x8000) != 0 || (GetAsyncKeyState(VK_RCTRL) & 0x8000) != 0;
+                bool altPressed = (GetAsyncKeyState(VK_LMENU) & 0x8000) != 0 || (GetAsyncKeyState(VK_RMENU) & 0x8000) != 0;
 
-                if (vkCode == VK_LWIN || vkCode == VK_RWIN)
+                if (wParam == (IntPtr)WM_KEYDOWN)
                 {
-                    // Re-check if Win is still pressed
-                    isWinPressed = (GetAsyncKeyState(VK_LWIN) & 0x8000) != 0 || (GetAsyncKeyState(VK_RWIN) & 0x8000) != 0;
-                }
+                    // Detect Ctrl+Alt+1
+                    if (vkCode == VK_1 && ctrlPressed && altPressed)
+                    {
+                        OnCtrlAlt1?.Invoke(this, new KeyEventArgs());
+                    }
 
-                if (vkCode == VK_SHIFT)
-                {
-                    isShiftPressed = (GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0;
+                    // Detect Ctrl+Alt+2
+                    if (vkCode == VK_2 && ctrlPressed && altPressed)
+                    {
+                        OnCtrlAlt2?.Invoke(this, new KeyEventArgs());
+                    }
                 }
             }
 
