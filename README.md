@@ -1,6 +1,6 @@
 # AksharaShift (അക്ഷരഷിഫ്റ്റ്)
 
-**AksharaShift** is a lightweight, offline Windows system tray utility for checking and converting **Malayalam Unicode text** into legacy ML (TTKarthika) and FML (Revathi) font formats.
+**AksharaShift** is a lightweight, offline Windows system tray utility for checking and converting **Malayalam Unicode text** into legacy ML and FML font formats.
 
 It runs silently in the background and offers a quick popup for text conversion, designed for users who work with legacy Malayalam desktop publishing software.
 
