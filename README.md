@@ -8,9 +8,7 @@ It runs silently in the background and offers a quick popup for text conversion,
 
 - **System Tray Integration**: Minimized to tray; click to open, right-click to exit.
 - **Offline Conversion**: No internet required. All logic is embedded.
-- **Support for Two Legacy Formats**:
-  - **ML (Karthika)**: Common legacy font encoding.
-  - **FML (Revathi)**: Phonetic legacy font encoding.
+- **Support for Two Legacy Formats (ML & FML)**
 - **Automatic Clipboard Handling**: Converted text is automatically copied to the clipboard.
 - **Normalize & Fix**: Automatically fixes common Unicode typing errors (e.g., split vowels, chillu letters).
 
@@ -20,8 +18,8 @@ It runs silently in the background and offers a quick popup for text conversion,
 2. **Open Converter**: Click the tray icon.
 3. **Convert**:
    - Paste Unicode Malayalam text into the input box.
-   - Click **Convert To ML** (for Karthika) or **Convert To FML** (for Revathi).
-4. **Paste**: The result is automatically copied to your clipboard. Paste it into your legacy application (Photoshop, PageMaker, etc.).
+   - Click **Convert To ML** or **Convert To FML**.
+4. **Paste**: The result is automatically copied to your clipboard. Paste it into your application (Photoshop, CorelDraw, PageMaker, etc.).
 
 ## Installation
 
