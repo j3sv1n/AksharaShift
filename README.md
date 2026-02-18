@@ -30,4 +30,3 @@ It runs silently in the background and offers a quick popup for text conversion,
 ## Technical Details
 
 - **Framework**: .NET 8.0 (WPF)
-- **License**: MIT
